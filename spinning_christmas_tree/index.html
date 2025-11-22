@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Christmas Spinning Tree</title>
+<style>
+/* === Expanded from your SCSS === */
+.title-msg {
+  position: absolute;
+  top: 5vh;
+  width: 100%;
+  text-align: center;
+  font-size: 2.2rem;
+  color: #ff77ff;
+  font-family: "Segoe UI", sans-serif;
+  letter-spacing: 2px;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadein 1.8s ease-out 3.5s forwards;
+  text-shadow: 0 0 10px #ff55ff, 0 0 20px #ff22ff;
+}
+
+@keyframes fadein {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body, div {
+  display: grid;
+}
+
+body {
+  place-content: center;
+  overflow-x: hidden;
+  margin: 0;
+  height: 100vh;
+  perspective: 35em;
+  background: #000014;
+}
+
+div {
+  transform-style: preserve-3d;
+}
+
+.a3d {
+  /* --n-arms, --n-stars, --n-loops are set from JS */
+  --m: calc(.5 * (var(--n-stars) - 1));
+  /* f = 1/3, t = 0.1s → 0.0333333s * nStars */
+  --t: calc(0.0333333s * var(--n-stars));
+  animation: roty 12s linear var(--t) infinite reverse;
+}
+
+@keyframes roty {
+  to {
+    rotate: y 1turn;
+  }
+}
+
+/* Stars */
+.🌟 {
+  /* 0 for star at the top, 1 for all others */
+  --q: min(1, var(--j));
+  /* 1 for star at the top, 0 for all others */
+  --p: calc(1 - var(--q));
+
+  /* s = 2em */
+  --s: calc((1.25 * var(--p) + var(--q) * var(--sf)) * 2em);
+
+  --ay0: calc(var(--i) / var(--n-arms) * 1turn);
+  --ay1: calc(var(--ay0) - var(--n-loops) * 1turn);
+  --ay: calc((var(--j) / var(--n-stars) * var(--n-loops) + var(--i) / var(--n-arms)) * 1turn);
+
+  /* offsets; y = 10 * s = 20em, z = 0.5*y = 10em, o = 0.75 */
+  --tx: calc(var(--q) * var(--rox) * 2em);
+
+  --ty0: calc(var(--m) / var(--n-stars) * 20em);
+  --ty1: calc(-1 * var(--ty0) - 0.75 * 2em);
+
+  --ty: calc(
+    (var(--j) - var(--m)) / var(--n-stars) * 20em +
+    (var(--q) * var(--roy) - var(--p) * 0.75) * 2em
+  );
+
+  --tz: calc(var(--j) / var(--n-stars) * 10em + var(--q) * var(--roz) * 2em);
+
+  grid-area: 1 / 1;
+  width: var(--s);
+  height: var(--s);
+
+  --pos: rotatey(var(--ay)) translate3d(var(--tx), var(--ty), var(--tz))
+    rotatey(calc(-1 * var(--ay)));
+
+  transform: var(--pos);
+
+  /* f = 1/3, t = 0.1s → 0.0333333s */
+  --dt: calc(0.0333333s * (var(--n-stars) - var(--j)));
+
+  animation:
+    grow calc(var(--q) * 0.1s) ease-out var(--dt) backwards,
+    move calc(var(--p) * var(--t)) linear;
+}
+
+/* star pseudo-element (the glowing star shape) */
+.🌟::after {
+  content: '';
+  width: 100%;
+  height: 100%;
+
+  /* lemonchiffon color logic */
+  opacity: calc(var(--p) + var(--q) * var(--j) / var(--n-stars) + 0.25);
+
+  background: radial-gradient(lemonchiffon 10%, rgba(255, 250, 205, 0.2));
+
+  /* Expanded @include star-shape-poly(8, .2); */
+  clip-path: polygon(
+    50% 0%,
+    53.54% 41.46%,
+    85.36% 14.64%,
+    58.54% 46.46%,
+    100% 50%,
+    58.54% 53.54%,
+    85.36% 85.36%,
+    53.54% 58.54%,
+    50% 100%,
+    46.46% 58.54%,
+    14.64% 85.36%,
+    41.46% 53.54%,
+    0% 50%,
+    41.46% 46.46%,
+    14.64% 14.64%,
+    46.46% 41.46%
+  );
+
+  animation:
+    roty 12s linear var(--t) infinite,
+    puls calc(var(--p) * 0.1s) ease-in-out infinite alternate,
+    hue 4s linear var(--dt) infinite;
+}
+
+/* Grow-in animation */
+@keyframes grow {
+  0% {
+    transform: var(--pos) scale(0);
+  }
+}
+
+/* Spiral movement from top to “tree” body */
+@keyframes move {
+  0% {
+    transform: rotatey(var(--ay0)) translate3d(0, var(--ty0), 10em)
+      rotatey(calc(-1 * var(--ay0)));
+  }
+  100% {
+    transform: rotatey(var(--ay1)) translate3d(0, var(--ty1), 0)
+      rotatey(calc(-1 * var(--ay1)));
+  }
+}
+
+/* Pulsing twinkle */
+@keyframes puls {
+  to {
+    scale: 0.2;
+    opacity: 0.2;
+  }
+}
+
+/* Color cycling for lights */
+@keyframes hue {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+</style>
+</head>
+<body>
+    <div class="title-msg">I love you bbi &lt;3</div>
+    <div class="a3d"></div>
+    
+<div class="a3d"></div>
+
+<script>
+// === JS equivalent of your Pug logic ===
+
+const n_arms = 2;
+const n_stars = 100;
+const n_loops = 4;
+const n = n_arms * n_stars;
+
+function sgn_rnd(v) {
+  return +(v * (Math.random() - 0.5)).toFixed(2);
+}
+
+const container = document.querySelector('.a3d');
+
+// set global CSS variables (like your inline style on .a3d)
+container.style.setProperty('--n-arms', n_arms);
+container.style.setProperty('--n-stars', n_stars);
+container.style.setProperty('--n-loops', n_loops);
+
+// create stars
+for (let k = 0; k < n; k++) {
+  const star = document.createElement('div');
+  star.className = '🌟';
+
+  // arm index (like --i from nth-child logic)
+  const i = Math.floor(k / n_stars);
+  // star index along that arm (like --j)
+  const j = k % n_stars;
+
+  const sf = +(1 - 0.5 * Math.random()).toFixed(2);
+
+  star.style.setProperty('--i', i);
+  star.style.setProperty('--j', j);
+  star.style.setProperty('--rox', sgn_rnd(0.4));
+  star.style.setProperty('--roy', sgn_rnd(0.4));
+  star.style.setProperty('--roz', sgn_rnd(0.4));
+  star.style.setProperty('--sf', sf);
+
+  container.appendChild(star);
+}
+</script>
+</body>
+</html>
+
+
+
